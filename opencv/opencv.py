@@ -203,6 +203,7 @@ plt.show()
 
 #toplam = cv2.addWeighted(img1,0.3,img2,0.7,0)
 #RENK COVER EDİP İMPLEMENT ETMEK
+"""
 img1 = cv2.imread("bleach1920.jpeg")
 imglast = img1
 img2 = cv2.imread("cv2.png")
@@ -232,4 +233,48 @@ cv2.imshow("Main Picture",imglast)
 cv2.imshow("New Logo",toplam)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+"""
 
+#Renkli Nesne Tespiti
+
+cam = cv2.VideoCapture(0)
+
+def nothing():
+    pass
+
+cv2.namedWindow("Color")
+cv2.createTrackbar("H1","Color",0,359,nothing)
+cv2.createTrackbar("H2","Color",0,359,nothing)
+cv2.createTrackbar("S1","Color",0,255,nothing)
+cv2.createTrackbar("S2","Color",0,255,nothing)
+cv2.createTrackbar("V1","Color",0,255,nothing)
+cv2.createTrackbar("V2","Color",0,255,nothing)
+
+
+
+while cam.isOpened():
+
+    _,frame = cam.read()
+
+    hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+
+    h1 = int(cv2.getTrackbarPos("H1","Color"))
+    h2 = int(cv2.getTrackbarPos("H2","Color"))
+    s1 = cv2.getTrackbarPos("S1","Color")
+    s2 = cv2.getTrackbarPos("S2","Color")
+    v1 = cv2.getTrackbarPos("V1","Color")
+    v2 = cv2.getTrackbarPos("V2","Color")
+
+    lower = np.array([h1,s1,v1])
+    upper = np.array([h2,s2,v2])
+
+    mask = cv2.inRange(hsv,lower,upper)
+
+    res = cv2.bitwise_and(frame,frame,mask=mask)
+
+    cv2.imshow("res",res)
+
+    if cv2.waitKey(1) == ord("q"):
+        break
+
+cv2.destroyAllWindows()
