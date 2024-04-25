@@ -1,0 +1,2 @@
+def yazdir():
+    print("yakup")
