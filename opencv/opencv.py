@@ -62,7 +62,7 @@ while cam.isOpened():
 
     ret, frame = cam.read()
 
-    frame = cv2.cvtColor(frame,cv2.COLOR_RGB2YCrCb)
+    frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
 
     if not ret:
         print("it is not opened")
@@ -190,6 +190,8 @@ while(1):
         
 """
 
+#Plt ile ekran göstermek
+"""
 image = cv2.imread("goku.jpeg")
 kirp = image[0:250,130:550]
 plt.subplot(1,2,1)
@@ -197,17 +199,37 @@ plt.imshow(image)
 plt.subplot(1,2,2)
 plt.imshow(kirp)
 plt.show()
+"""
 
+#toplam = cv2.addWeighted(img1,0.3,img2,0.7,0)
+#RENK COVER EDİP İMPLEMENT ETMEK
+img1 = cv2.imread("bleach1920.jpeg")
+imglast = img1
+img2 = cv2.imread("cv2.png")
 
-aç = False
-tok = True
-print("aç değil misin")
-if not tok:
-    print("tok değilim")
+x,y,z = img2.shape
+roi = img1[0:x,0:y] #BU ANA GÖRSELİN LOGO KADAR KIRPILMIŞ HALİ
 
-elif not aç:
-    print("evet aç değilim, waffle no yani")
+img_gray = cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY)
 
-else:
-    print("yemek")
+#ret eşik değeri döndürüyor, mask ise yeni yapılan arrayi döndürüyor 0 ve 255den oluşan.
+ret , mask = cv2.threshold(img_gray,10,255,cv2.THRESH_BINARY)
+
+img_invert = cv2.bitwise_not(mask) #şuan 0 ve 255ler yer değişti arka plan 255 oldu
+
+img_bg = cv2.bitwise_and(roi,roi,mask=img_invert) # çarpma yapıldı logo 0 oldugu için siyah olarak kaldı
+
+img_fg = cv2.bitwise_and(img2,img2,mask=mask) # bu işlem ile 0,0,3 olan veri alınmamış olunuyor img_bg ye
+
+toplam = cv2.add(img_bg,img_fg)
+
+imglast[0:x,0:y] = toplam
+
+cv2.namedWindow("Bleach x OpenCV",cv2.WINDOW_NORMAL)
+cv2.imshow("First Picture",img1)
+cv2.imshow("First Logo",img2)
+cv2.imshow("Main Picture",imglast)
+cv2.imshow("New Logo",toplam)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 
