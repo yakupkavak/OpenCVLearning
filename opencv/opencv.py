@@ -199,6 +199,7 @@ plt.imshow(image)
 plt.subplot(1,2,2)
 plt.imshow(kirp)
 plt.show()
+plt.show
 """
 
 #toplam = cv2.addWeighted(img1,0.3,img2,0.7,0)
@@ -236,7 +237,7 @@ cv2.destroyAllWindows()
 """
 
 #Renkli Nesne Tespiti
-
+"""
 cam = cv2.VideoCapture(0)
 
 def nothing():
@@ -278,3 +279,95 @@ while cam.isOpened():
         break
 
 cv2.destroyAllWindows()
+"""
+
+#Yeniden Boyutlandırma vs
+img = cv2.imread("bleach1920.jpeg")
+res = cv2.resize(img,None,fx=1.2,fy=1.5,interpolation=cv2.INTER_CUBIC)
+
+row,colums = img.shape[:2] #ilk 2 parametresini alıyoruz burada
+
+#add padding
+translation_mat = np.float32([[1,0,25], [0,1,25]])
+img_trans = cv2.warpAffine(img,translation_mat,(colums+50,row+50))
+
+#rotation matrix
+rotation = cv2.getRotationMatrix2D((colums/2,row/2),-30,1)
+img_rota = cv2.warpAffine(img,rotation,(int(colums*1.2),int(row*1.2)))
+
+#AfineTransform noktalar seçip bunlar arasında eğilim vermek -1çünkü 0dan başlıyor
+src_af = np.float32([
+    [0,0],
+    [colums-1,0],
+    [0,row-1]])
+dest_af = np.float32([
+    [int(0.1*colums-1),0],
+    [int(0.8*(colums-1)),0],
+    [int(0.2*(colums-1)),row-1]]
+)
+affine= cv2.getAffineTransform(src_af,dest_af)
+img_aff = cv2.warpAffine(img,affine,(colums,row))
+
+
+
+#perspectivetransform 4 nokta seçerek
+src_af = np.float32([
+    [0,0],
+    [colums-1,0],
+    [0,row-1],
+    [colums-1,row-1]])
+
+dest_af = np.float32([
+    [0,0],
+    [colums-1,0],
+    [int(0.2*(colums-1)),row-1],
+    [int(0.8*(colums-1)),row-1]])
+
+projective_affline = cv2.getPerspectiveTransform(src_af,dest_af)
+
+img_new = cv2.warpPerspective(img,projective_affline,(colums,row))
+
+
+
+
+newSource = []
+source_list = []
+counter = 0
+mySource = np.float32([
+    [0,0],
+    [800,0],
+    [0,800],
+    [800,800]])
+myImage = cv2.imread("uyg.jpg")
+myRow,myCol = myImage.shape[:2]
+def mouseCall(event,x,y,flags,param):
+    global source_list,counter,newSource
+    if(event == cv2.EVENT_LBUTTONDOWN):
+        if counter < 4:
+            source_list.append([x, y])
+            counter += 1
+
+        else:
+            newSource = np.float32([[source_list[0][0],source_list[0][1]],
+                         [source_list[1][0],source_list[1][1]],
+                         [source_list[2][0],source_list[2][1]],
+                         [source_list[3][0],source_list[3][1]]])
+
+            project = cv2.getPerspectiveTransform(newSource,mySource)
+            newImage = cv2.warpPerspective(myImage,project,(800,800))
+            cv2.imshow("trans", newImage)
+            counter = 0
+            source_list = []
+
+while(1):
+    cv2.imshow("img", myImage)
+
+    cv2.setMouseCallback("img",mouseCall)
+    if cv2.waitKey(1) == ord("q"):
+        break
+
+
+cv2.destroyAllWindows()
+
+
+
