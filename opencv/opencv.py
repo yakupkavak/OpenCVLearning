@@ -1,3 +1,5 @@
+import time
+
 import cv2
 import numpy as np
 
@@ -259,8 +261,8 @@ while cam.isOpened():
 
     hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
 
-    h1 = int(cv2.getTrackbarPos("H1","Color"))
-    h2 = int(cv2.getTrackbarPos("H2","Color"))
+    h1 = int(cv2.getTrackbarPos("H1","Color")/2)
+    h2 = int(cv2.getTrackbarPos("H2","Color")/2)
     s1 = cv2.getTrackbarPos("S1","Color")
     s2 = cv2.getTrackbarPos("S2","Color")
     v1 = cv2.getTrackbarPos("V1","Color")
@@ -282,6 +284,7 @@ cv2.destroyAllWindows()
 """
 
 #Yeniden Boyutlandırma vs
+"""
 img = cv2.imread("bleach1920.jpeg")
 res = cv2.resize(img,None,fx=1.2,fy=1.5,interpolation=cv2.INTER_CUBIC)
 
@@ -368,6 +371,77 @@ while(1):
 
 
 cv2.destroyAllWindows()
+"""
+
+#Morfolojik İşlemler
+"""
+image = cv2.imread("goku.jpeg",0)
+_, thresh = cv2.threshold(image,0,255,cv2.THRESH_BINARY+ cv2.THRESH_OTSU)
+kernel = np.ones((2,2),np.uint8)
+kernelN = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
+
+erosion = cv2.erode(thresh, kernel, iterations=1)
+dilation = cv2.dilate(thresh, kernel, iterations=1)
+opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
+closing = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+tophat = cv2.morphologyEx(thresh, cv2.MORPH_TOPHAT, kernel)
+blackhat = cv2.morphologyEx(thresh, cv2.MORPH_BLACKHAT, kernel)
+gradient = cv2.morphologyEx(thresh, cv2.MORPH_GRADIENT, kernel)
+
+plt.subplot(241),plt.imshow(thresh,"gray"),plt.title("orijinal")
+plt.subplot(242),plt.imshow(erosion,"gray"),plt.title("erosion")
+plt.subplot(243),plt.imshow(dilation,"gray"),plt.title("dilation")
+plt.subplot(244),plt.imshow(opening,"gray"),plt.title("opening")
+plt.subplot(245),plt.imshow(closing,"gray"),plt.title("closing")
+plt.subplot(246),plt.imshow(tophat,"gray"),plt.title("tophat")
+plt.subplot(247),plt.imshow(blackhat,"gray"),plt.title("blackhat")
+plt.subplot(248),plt.imshow(gradient,"gray"),plt.title("gradient")
+
+plt.show()
+"""
+
+#Görünmezlik Pelerini
+
+cam = cv2.VideoCapture(0)
+
+lower = np.array([59,0,100])
+upper = np.array([183,118,225])
+
+time.sleep(1.0)
+_, backgroud = cam.read()
+
+kernel = np.ones((5,5),np.uint8)
+kernel2 = np.ones((10,10),np.uint8)
+kernel3 = np.ones((23,23),np.uint8)
+
+
+while cam.isOpened():
+    _, frame = cam.read()
+
+    hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+
+    mask = cv2.inRange(hsv,lower,upper) #her taraf siyah maske beyaz
+
+    mask = cv2.morphologyEx(mask,cv2.MORPH_CLOSE,kernel) #önce iç boşlukları dolduruyor, sonra kapatıyor dışarıdan iç kısmı silmek
+    mask = cv2.morphologyEx(mask,cv2.MORPH_OPEN,kernel2) #önce beyazları kısıyor sonra açıyor etraftakileri silmek
+    mask = cv2.dilate(mask,kernel3,iterations=1) #dış hatları genişletiyor
 
 
 
+    mask_not = cv2.bitwise_not(mask) #her taraf beyaz maske hariç
+
+    backimage = cv2.bitwise_and(backgroud,backgroud,mask= mask)
+    frontimage = cv2.bitwise_and(frame,frame,mask= mask_not)
+
+    total = cv2.addWeighted(backimage,1,frontimage,1,0)
+
+    cv2.imshow("original",frame)
+    cv2.imshow("mask",mask)
+    cv2.imshow("masked", total)
+    cv2.imshow("bacgkroun",backgroud)
+
+    if(cv2.waitKey(1) == ord('q')):
+        break
+
+cam.release()
+cv2.destroyAllWindows()
