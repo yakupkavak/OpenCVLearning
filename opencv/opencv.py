@@ -401,7 +401,7 @@ plt.show()
 """
 
 #Görünmezlik Pelerini
-
+"""
 cam = cv2.VideoCapture(0)
 
 lower = np.array([59,0,100])
@@ -445,3 +445,106 @@ while cam.isOpened():
 
 cam.release()
 cv2.destroyAllWindows()
+"""
+
+#Filtre
+"""
+img = cv2.imread("1goku.jpeg")
+
+kernel = np.ones((10,10),np.float32)/100
+dst = cv2.filter2D(img,-1,kernel)
+
+dst = cv2.blur(img,(10,10))
+
+dst = cv2.GaussianBlur(img,(7,7),0)
+
+dst = cv2.medianBlur(img, 7)
+
+filter = np.array([[-1,-1,-1],
+                    [-1,9,-1],
+                    [-1,-1,-1]])
+
+filter = np.array([[0,0,-1, 0,0],
+                    [0, -1,-2,-1,0],
+                    [-1,-2,16,-2,-1],
+                    [0,-1,-2,-1,0],
+                    [0,0,-1,0,0]])
+
+
+filter = np.array([[4,-3,-4],
+                    [-5,7,-7],
+                    [3,-2,-1]])
+dst = cv2.filter2D(img,-1,filter)
+
+filter = np.array([[0.272, 0.534, 0.131],
+                    [0.349, 0.686, 0.168],
+                   [0.393, 0.769, 0.189]])
+dst = cv2.transform(img, filter)
+
+
+filter = np.array([[0,1,0],
+                   [0,0,0],
+                   [0,-1,0]])
+
+dst = cv2.filter2D(img,-1,filter) + 64
+
+cv2.imshow("img",img)
+cv2.imshow("dst",dst)
+cv2.waitKey()
+
+cv2.destroyAllWindows()
+"""
+
+#Kenar
+"""
+img = cv2.imread("goku.jpeg",0)
+img1 = cv2.imread("goku.jpeg",1)
+
+img_color = cv2.cvtColor(img1,cv2.COLOR_BGR2RGB)
+                #rakamlar 0,255arası
+sobelX = cv2.Sobel(img,-1,1,0,ksize=5)
+sobelY = cv2.Sobel(img,-1,0,1,ksize=5)
+sobel = cv2.Sobel(img,-1,1,1,ksize=5)
+
+laplacian = cv2.Laplacian(img,-1,ksize=3)
+
+canny = cv2.Canny(img,200,210)
+
+plt.subplot(2,3,1),plt.imshow(img_color),plt.title("original")
+plt.subplot(2,3,2),plt.imshow(sobelX,"gray"),plt.title("sobelX")
+plt.subplot(2,3,3),plt.imshow(sobelY,"gray"),plt.title("sobelY")
+plt.subplot(2,3,4),plt.imshow(sobel,"gray"),plt.title("sobel")
+plt.subplot(2,3,5),plt.imshow(laplacian,"gray"),plt.title("laplacian")
+plt.subplot(2,3,6),plt.imshow(canny,"gray"),plt.title("canny")
+
+
+plt.show()
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
