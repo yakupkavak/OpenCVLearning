@@ -521,9 +521,7 @@ plt.subplot(2,3,6),plt.imshow(canny,"gray"),plt.title("canny")
 plt.show()
 """
 
-
-
-
+#Hough Transform
 
 
 
