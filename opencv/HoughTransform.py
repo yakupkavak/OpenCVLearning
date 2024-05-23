@@ -4,8 +4,8 @@ from matplotlib import pyplot as plt
 from random import randint as rnd
 
 img = cv2.imread("goku.jpeg")
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-edges = cv2.Canny(gray,40,100)
+img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+edges = cv2.Canny(img,40,100)
 
 def nothing(x):
     pass
