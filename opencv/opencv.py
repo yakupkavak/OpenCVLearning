@@ -206,7 +206,7 @@ plt.show
 
 #toplam = cv2.addWeighted(img1,0.3,img2,0.7,0)
 #RENK COVER EDİP İMPLEMENT ETMEK
-"""
+
 img1 = cv2.imread("bleach1920.jpeg")
 imglast = img1
 img2 = cv2.imread("cv2.png")
@@ -236,7 +236,7 @@ cv2.imshow("Main Picture",imglast)
 cv2.imshow("New Logo",toplam)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-"""
+
 
 #Renkli Nesne Tespiti
 """
